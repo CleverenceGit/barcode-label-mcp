@@ -49,11 +49,28 @@ jobs:
       - name: Publish to npm
         run: |
           NAME=$(node -p "require('./package.json').name")
-          if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
+          echo "NAME=$NAME" >> "$GITHUB_ENV"
+          if npm view "$NAME@$VERSION" version --prefer-online >/dev/null 2>&1; then
             echo "$NAME@$VERSION is already on npm; skipping."
+          elif ! npm publish --access public --provenance > publish.log 2>&1; then
+            cat publish.log
+            # E409: published by an earlier attempt but not listed yet; the next step waits for it.
+            grep -q E409 publish.log || exit 1
           else
-            npm publish --access public --provenance
+            cat publish.log
           fi
+
+      # npm takes a few minutes to list a new version, and the MCP Registry rejects a
+      # server whose npm version it cannot see yet.
+      - name: Wait until npm lists the version
+        run: |
+          for i in $(seq 1 60); do
+            if npm view "$NAME@$VERSION" version --prefer-online >/dev/null 2>&1; then
+              echo "npm lists $NAME@$VERSION"; exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::npm did not list $NAME@$VERSION within 10 minutes"; exit 1
 
       - name: Publish to the MCP Registry
         env:
