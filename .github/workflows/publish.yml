@@ -1,0 +1,64 @@
+# Publishes the package to npm and the server to the official MCP Registry.
+#
+# Run it by pushing a tag that matches package.json, e.g. `git tag v1.8.1 && git push origin v1.8.1`,
+# or by hand from the Actions tab (Run workflow) to publish the current main.
+#
+# npm: trusted publishing (OIDC), no stored token. On npmjs.com the package's
+#   Settings > Trusted Publisher must name CleverenceGit/barcode-label-mcp and publish.yml.
+#   A version already on npm is skipped, so a re-run only does the registry step.
+# MCP Registry: the name com.cleverence/barcode-label is proven by the DNS TXT record on
+#   cleverence.com; the matching Ed25519 private key (hex) is the secret MCP_REGISTRY_PRIVATE_KEY.
+
+name: Publish
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # npm trusted publishing and provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24 # npm 11.5.1+ is needed for trusted publishing
+          registry-url: https://registry.npmjs.org
+
+      - name: Versions agree
+        run: |
+          PKG=$(node -p "require('./package.json').version")
+          SRV=$(node -p "require('./server.json').version")
+          SRV_PKG=$(node -p "require('./server.json').packages[0].version")
+          echo "package.json $PKG, server.json $SRV / $SRV_PKG"
+          [ "$PKG" = "$SRV" ] && [ "$PKG" = "$SRV_PKG" ] || { echo "::error::Versions differ"; exit 1; }
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "${GITHUB_REF_NAME}" != "v$PKG" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match package version $PKG"; exit 1
+          fi
+          echo "VERSION=$PKG" >> "$GITHUB_ENV"
+
+      - run: npm ci # runs prepare, which builds dist/
+      - run: npm test
+
+      - name: Publish to npm
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
+            echo "$NAME@$VERSION is already on npm; skipping."
+          else
+            npm publish --access public --provenance
+          fi
+
+      - name: Publish to the MCP Registry
+        env:
+          MCP_PRIVATE_KEY: ${{ secrets.MCP_REGISTRY_PRIVATE_KEY }}
+        run: |
+          curl -sSL https://github.com/modelcontextprotocol/registry/releases/download/v1.8.15/mcp-publisher_linux_amd64.tar.gz | tar xz mcp-publisher
+          ./mcp-publisher login dns --domain cleverence.com
+          ./mcp-publisher publish
