@@ -3,7 +3,7 @@
   "name": "com.cleverence/barcode-label",
   "title": "Cleverence Label",
   "description": "Design, check and render barcode labels in Cleverence Label from your AI agent.",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "websiteUrl": "https://www.cleverence.com/label/ai-agents",
   "repository": {
     "url": "https://github.com/CleverenceGit/barcode-label-mcp",
@@ -13,7 +13,7 @@
     {
       "registryType": "npm",
       "identifier": "@cleverence/barcode-label-mcp",
-      "version": "1.8.0",
+      "version": "1.8.1",
       "transport": { "type": "stdio" },
       "environmentVariables": [
         {

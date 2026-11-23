@@ -380,7 +380,7 @@ describe('script tools', () => {
     expect(r.content).toHaveLength(2);
   });
 
-  it('is version 1.8.0', () => {
-    expect(CLIENT_VERSION).toBe('1.8.0');
+  it('is version 1.8.1', () => {
+    expect(CLIENT_VERSION).toBe('1.8.1');
   });
 });

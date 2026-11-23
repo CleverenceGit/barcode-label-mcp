@@ -1,6 +1,6 @@
 {
   "name": "@cleverence/barcode-label-mcp",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "mcpName": "com.cleverence/barcode-label",
   "description": "MCP server for Cleverence Label — author, validate, render and embed barcode label designs",
   "license": "MIT",
