@@ -15,7 +15,7 @@ function compareVersions(a: string, b: string): number {
 /** Kept in step with package.json; sent on every request so the server can
  *  attribute traffic to this client and flag installs that are too old. */
 export const CLIENT_NAME = 'barcode-label-mcp';
-export const CLIENT_VERSION = '1.8.1';
+export const CLIENT_VERSION = '1.8.2';
 
 /**
  * A refusal from the API, with the machine-readable parts kept.

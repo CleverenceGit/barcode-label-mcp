@@ -4,7 +4,7 @@
  *
  * Runs under the root vitest config (it includes cleverence-label-mcp/test).
  */
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -34,5 +34,19 @@ describe('the key and base URL', () => {
     const env = { CLEVERENCE_LABEL_DESIGN_KEY: 'cl_live_new', CLEVERENCE_API_KEY: 'cl_live_old' };
     expect(resolve(env).apiKey).toBe('cl_live_new');
     expect(resolve(env, { key: 'cl_live_flag' }).apiKey).toBe('cl_live_flag');
+  });
+
+  it('treats a blank key as unset, so the key saved by connect is used', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'cl-mcp-saved-'));
+    writeFileSync(join(dir, 'credentials.json'), JSON.stringify({ apiKey: 'cl_live_saved', savedAt: '2026-11-23' }));
+    const before = process.env.CLEVERENCE_CONFIG_DIR;
+    process.env.CLEVERENCE_CONFIG_DIR = dir;
+    try {
+      expect(resolve({ CLEVERENCE_LABEL_DESIGN_KEY: '' }).apiKey).toBe('cl_live_saved');
+      expect(resolve({ CLEVERENCE_LABEL_DESIGN_KEY: '  ' }).apiKey).toBe('cl_live_saved');
+    } finally {
+      process.env.CLEVERENCE_CONFIG_DIR = before;
+    }
+    expect(resolve({ CLEVERENCE_LABEL_DESIGN_KEY: '' }).apiKey).toBeNull();
   });
 });

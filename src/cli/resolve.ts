@@ -28,10 +28,13 @@ export function resolveConfig(
   // Starting without any of them is no longer an error: refusing to boot would
   // leave the user with no way to run `connect`, which is the tool that
   // obtains the key in the first place.
+  // A blank value counts as unset: a launcher that fills the variable from an
+  // optional setting (a Claude plugin, for one) passes "" when the field is empty,
+  // and that must not hide the key saved by `connect`.
   const apiKey =
-    argv.key ??
-    env.CLEVERENCE_LABEL_DESIGN_KEY ??
-    env.CLEVERENCE_API_KEY ??
+    nonBlank(argv.key) ??
+    nonBlank(env.CLEVERENCE_LABEL_DESIGN_KEY) ??
+    nonBlank(env.CLEVERENCE_API_KEY) ??
     readCredentials()?.apiKey ??
     null;
 
@@ -40,4 +43,10 @@ export function resolveConfig(
   }
 
   return { ok: true, config: { transport, apiKey, port, baseUrl } };
+}
+
+function nonBlank(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
 }

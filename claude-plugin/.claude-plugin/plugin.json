@@ -1,0 +1,31 @@
+{
+  "name": "cleverence-label",
+  "displayName": "Cleverence Label",
+  "version": "1.8.2",
+  "description": "Design, check, render and print barcode labels in Cleverence Label from Claude.",
+  "author": {
+    "name": "Cleverence",
+    "url": "https://www.cleverence.com/label"
+  },
+  "homepage": "https://www.cleverence.com/label/ai-agents",
+  "repository": "https://github.com/CleverenceGit/barcode-label-mcp",
+  "license": "MIT",
+  "keywords": ["barcode", "label", "printing", "gs1", "upc", "qr", "thermal printer"],
+  "icon": "./logo.png",
+  "documentationUrl": "https://www.cleverence.com/label/ai-agents",
+  "supportUrl": "https://www.cleverence.com/label/support",
+  "privacyPolicyUrl": "https://www.cleverence.com/label/privacy",
+  "termsOfServiceUrl": "https://www.cleverence.com/label/terms",
+  "network": {
+    "hosts": ["label.cleverence.com", "registry.npmjs.org"]
+  },
+  "userConfig": {
+    "design_key": {
+      "type": "string",
+      "title": "Cleverence Label API key (optional)",
+      "description": "Leave empty to connect in the browser: the first time Claude needs your account, it shows a link where you sign in and approve. To use a key you already have, paste it here.",
+      "sensitive": true,
+      "default": ""
+    }
+  }
+}

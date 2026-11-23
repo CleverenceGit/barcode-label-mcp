@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "cleverence-label": {
+      "command": "npx",
+      "args": ["-y", "@cleverence/barcode-label-mcp@1.8.2"],
+      "env": {
+        "CLEVERENCE_LABEL_DESIGN_KEY": "${user_config.design_key}"
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "cleverence",
+  "description": "Cleverence plugins for Claude: barcode label design, checking, rendering and printing.",
+  "owner": {
+    "name": "Cleverence",
+    "url": "https://www.cleverence.com/label"
+  },
+  "plugins": [
+    {
+      "name": "cleverence-label",
+      "source": "./claude-plugin",
+      "description": "Design, check, render and print barcode labels in Cleverence Label from Claude."
+    }
+  ]
+}
